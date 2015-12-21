@@ -1,0 +1,31 @@
+discovery:
+  image: jwilder/docker-gen
+  volumes:
+    - "/var/run/docker.sock:/tmp/docker.sock:ro"
+    - "./templates:/etc/docker-gen/templates"
+    - "./haproxy:/etc/haproxy"
+  command: "-watch /etc/docker-gen/templates/haproxy.cfg.tmpl /etc/haproxy/haproxy.cfg"
+haproxy:
+  image: indiehosters/haproxy
+  volumes:
+    - "./haproxy:/etc/haproxy"
+    - "/dev/log:/dev/log"
+  links:
+    - letsencrypt
+  ports:
+    - "80:80"
+    - "443:443"
+letsencrypt:
+  image: nginx
+  volumes:
+    - "./acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge:ro"
+letsencrypt-watch:
+  image: indiehosters/letsencrypt
+  volumes:
+    - "./haproxy:/etc/haproxy"
+    - "./acme-challenge:/html-root/.well-known/acme-challenge/"
+    - "./letsencrypt:/etc/letsencrypt"
+ocsp:
+  image: indiehosters/ocsp
+  volumes:
+    - "./haproxy:/etc/haproxy"

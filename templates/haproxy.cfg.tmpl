@@ -13,6 +13,8 @@ defaults
   option httplog
   option dontlognull
   retries 3
+  compression algo gzip
+  compression type text/html text/plain text/css application/javascript
   timeout connect 5000
   timeout client 50000
   timeout server 50000

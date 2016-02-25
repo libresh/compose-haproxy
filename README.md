@@ -1,5 +1,5 @@
-# haproxy
-HAproxy for IndieHosters
+# HAProxy
+HAProxy for IndieHosters
 
 # Warning: still experimental, use at your own risk
 

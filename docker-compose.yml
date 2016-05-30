@@ -24,7 +24,6 @@ letsencrypt-watch:
   volumes:
     - "./haproxy:/etc/haproxy"
     - "./acme-challenge:/html-root/.well-known/acme-challenge/"
-    - "./letsencrypt:/etc/letsencrypt"
 ocsp:
   image: indiehosters/ocsp
   volumes:

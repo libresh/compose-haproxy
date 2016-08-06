@@ -33,15 +33,16 @@ mode http
   rspadd  Strict-Transport-Security:\ max-age=15768000
 
   use_backend letsencrypt if { path_beg /.well-known/acme }
-{{ range $host, $container := groupBy $ "Env.HOST" }}
-  use_backend {{ $host}} if { hdr(host) -i {{ $host }} www.{{ $host }} }
+{{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
+  use_backend {{ $host}} if { hdr(host) -i {{ $host }} }
 {{end}}
 
-{{ $containers := whereExist $ "Env.HOST" }}
-{{ range $container := $containers }}
-backend {{ $container.Env.HOST }}
+{{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
+backend {{ $host }}
   cookie SERVERID insert nocache indirect
+  {{ range $container := $containers }}
   server Server {{ $container.IP }}:80 cookie Server
+  {{end}}
 {{end}}
 
 backend letsencrypt

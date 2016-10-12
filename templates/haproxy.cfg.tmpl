@@ -43,7 +43,8 @@ backend {{ $host }}
   option http-server-close
   cookie SERVERID insert nocache indirect
   {{ range $container := $containers }}
-  server Server {{ $container.IP }}:80 cookie Server
+  {{ $network := index $container.Networks 0 }}
+  server Server {{ $network.IP }}:80 cookie Server
   {{end}}
 {{end}}
 

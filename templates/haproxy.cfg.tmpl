@@ -10,6 +10,7 @@ defaults
   mode http
   option forwardfor
   option httpclose
+  option http-server-close
   option httplog
   option dontlognull
   retries 3
@@ -39,6 +40,7 @@ mode http
 
 {{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
 backend {{ $host }}
+  option http-server-close
   cookie SERVERID insert nocache indirect
   {{ range $container := $containers }}
   server Server {{ $container.IP }}:80 cookie Server

@@ -30,7 +30,7 @@ docker-compose up -d
 And profit!
 
 ```
-docker run -e HOST=example.org nginx
+docker run -e VIRTUAL_HOST=example.org nginx
 ```
 
 ## Contributing

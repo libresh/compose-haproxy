@@ -15,11 +15,11 @@ haproxy:
   ports:
     - "80:80"
     - "443:443"
-letsencrypt:
+letsencrypt-web:
   image: nginx
   volumes:
     - "./acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge:ro"
-letsencrypt-watch:
+letsencrypt:
   image: indiehosters/letsencrypt
   volumes:
     - "./haproxy:/etc/haproxy"

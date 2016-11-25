@@ -33,7 +33,7 @@ mode http
   reqadd X-Forwarded-Proto:\ https
   rspadd  Strict-Transport-Security:\ max-age=15768000
 
-  use_backend letsencrypt if { path_beg /.well-known/acme }
+  use_backend letsencrypt-web if { path_beg /.well-known/acme }
 {{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
   use_backend {{ $host}} if { hdr(host) -i {{ $host }} }
 {{end}}
@@ -48,6 +48,6 @@ backend {{ $host }}
   {{end}}
 {{end}}
 
-backend letsencrypt
+backend letsencrypt-web
   cookie SERVERID insert nocache indirect
-  server Server letsencrypt:80 cookie Server
+  server Server letsencrypt-web:80 cookie Server

@@ -24,6 +24,7 @@ letsencrypt:
   volumes:
     - "./haproxy:/etc/haproxy"
     - "./acme-challenge:/html-root/.well-known/acme-challenge/"
+    - "./certs:/var/certs"
 ocsp:
   image: indiehosters/ocsp
   volumes:

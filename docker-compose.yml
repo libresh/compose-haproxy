@@ -2,7 +2,7 @@ version: '2'
 
 networks:
   web:
-    external: true
+    driver: bridge
 
 services:
   discovery:

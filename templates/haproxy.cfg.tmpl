@@ -43,8 +43,17 @@ backend {{ $host }}
   option http-server-close
   cookie SERVERID insert nocache indirect
   {{ range $container := $containers }}
-  {{ $network := index $container.Networks 0 }}
+    {{ $networkLen := len $container.Networks }}
+    {{ if eq $networkLen 1 }}
+      {{ $network := index $container.Networks 0 }}
   server Server {{ $network.IP }}:80 cookie Server
+    {{ else }}
+      {{ range $network := $container.Networks }}
+        {{ if eq $network.Name "lb_web" }}
+  server Server {{ $network.IP }}:80 cookie Server
+        {{end}}
+      {{end}}
+    {{end}}
   {{end}}
 {{end}}
 

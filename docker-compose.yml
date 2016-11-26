@@ -1,8 +1,8 @@
 version: '2'
 
 networks:
-  web:
-    driver: bridge
+  lb_web:
+    external: true
 
 services:
   discovery:
@@ -23,13 +23,13 @@ services:
     - "80:80"
     - "443:443"
     networks:
-    - web
+    - lb_web
   letsencrypt-web:
     image: nginx
     volumes:
     - "./acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge:ro"
     networks:
-    - web
+    - lb_web
   letsencrypt:
     image: indiehosters/letsencrypt
     volumes:

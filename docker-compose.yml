@@ -8,35 +8,35 @@ services:
   discovery:
     image: jwilder/docker-gen
     volumes:
-      - "/var/run/docker.sock:/tmp/docker.sock:ro"
-      - "./templates:/etc/docker-gen/templates"
-      - "./haproxy:/etc/haproxy"
+    - "/var/run/docker.sock:/tmp/docker.sock:ro"
+    - "./templates:/etc/docker-gen/templates"
+    - "./haproxy:/etc/haproxy"
     command: "-watch /etc/docker-gen/templates/haproxy.cfg.tmpl /etc/haproxy/haproxy.cfg"
   haproxy:
     image: indiehosters/haproxy
     volumes:
-      - "./haproxy:/etc/haproxy"
-      - "/dev/log:/dev/log"
+    - "./haproxy:/etc/haproxy"
+    - "/dev/log:/dev/log"
     links:
-      - letsencrypt
+    - letsencrypt
     ports:
-      - "80:80"
-      - "443:443"
+    - "80:80"
+    - "443:443"
     networks:
     - web
   letsencrypt-web:
     image: nginx
     volumes:
-      - "./acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge:ro"
+    - "./acme-challenge:/usr/share/nginx/html/.well-known/acme-challenge:ro"
     networks:
     - web
   letsencrypt:
     image: indiehosters/letsencrypt
     volumes:
-      - "./haproxy:/etc/haproxy"
-      - "./acme-challenge:/html-root/.well-known/acme-challenge/"
-      - "./certs:/var/certs"
+    - "./haproxy:/etc/haproxy"
+    - "./acme-challenge:/html-root/.well-known/acme-challenge/"
+    - "./certs:/var/certs"
   ocsp:
     image: indiehosters/ocsp
     volumes:
-      - "./haproxy:/etc/haproxy"
+    - "./haproxy:/etc/haproxy"

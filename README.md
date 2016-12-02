@@ -22,6 +22,7 @@ Each time you add a container with the environment variable `VIRTUAL_HOST` it wi
 ## Get started
 
 ```
+docker network create lb_web
 git clone https://github.com/indiehosters/haproxy.git
 cd haproxy
 docker-compose up -d

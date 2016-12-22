@@ -34,6 +34,9 @@ mode http
   rspadd  Strict-Transport-Security:\ max-age=15768000
 
   use_backend letsencrypt-web if { path_beg /.well-known/acme }
+{{ range $host, $containers := groupBy $ "Env.LIBRESH_WEBHOOK_HOST" }}
+  use_backend webhook if { path_beg /XxosJDdRpo7Rww87VkJGzv1QLegnhh-uniq-libresh }
+{{end}}
 {{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
   use_backend {{ $host}} if { hdr(host) -i {{ $host }} }
 {{end}}
@@ -60,3 +63,8 @@ backend {{ $host }}
 backend letsencrypt-web
   cookie SERVERID insert nocache indirect
   server Server letsencrypt-web:80 cookie Server
+{{ range $host, $containers := groupBy $ "Env.LIBRESH_WEBHOOK_HOST" }}
+backend webhook
+  cookie SERVERID insert nocache indirect
+  server Server webhook:80 cookie Server
+{{end}}

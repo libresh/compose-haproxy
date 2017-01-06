@@ -22,16 +22,26 @@ Each time you add a container with the environment variable `VIRTUAL_HOST` it wi
 ## Get started
 
 ```
+docker network create lb_web
 git clone https://github.com/indiehosters/haproxy.git
 cd haproxy
 docker-compose up -d
 ```
 
-And profit!
+In these commands, we just created one network (lb_web) to isolate HAProxy with the web servers, and then, we started the containers of HAProxy and companions.
 
 ```
-docker run -e VIRTUAL_HOST=example.org nginx
+docker run --network=lb_web -e VIRTUAL_HOST=example.org nginx
 ```
+
+Here, we just started the most simple web server, and added to the lb_web network.
+The only thing that HAProxy needs to see and connect to this container are the following:
+ - expose a port 80
+ - have a VIRTUAL_HOST variable setup with the domain name
+ - be in the lb_web network
+ 
+And finally for HAProxy to be able to provision the Let's encrypt certificate, you need to configure your DNS for example.org to point to the IP of HAProxy.
+
 
 ## Contributing
 

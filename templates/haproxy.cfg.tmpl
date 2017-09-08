@@ -26,7 +26,7 @@ frontend http-in
 {{ range $host, $container := groupBy $ "Env.AUTOCONFIG_HOST" }}
   redirect location https://{{ $host }}/mail/config-v1.1.xml code 301 if { hdr_beg(host) -i autoconfig }
 {{end}}
-  redirect scheme https code 301 ! { ssl_fc }
+  redirect scheme https code 301 if ! { ssl_fc }
 
 frontend https-in
 mode http

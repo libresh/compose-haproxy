@@ -30,7 +30,7 @@ frontend http-in
 
 frontend https-in
 mode http
-  bind *:443 ssl crt /etc/haproxy/certs
+  bind *:443 ssl no-sslv3 crt /etc/haproxy/certs alpn h2,http/1.1
   reqadd X-Forwarded-Proto:\ https
   rspadd X-Frame-Options:\ SAMEORIGIN # OR DENY
   rspadd X-XSS-Protection:\ 1;\ mode=block

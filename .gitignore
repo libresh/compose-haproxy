@@ -1,3 +1,4 @@
 certs/*
 haproxy/certs/*
 haproxy/haproxy.cfg
+acme-challenge/*

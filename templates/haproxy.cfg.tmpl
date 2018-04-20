@@ -32,6 +32,12 @@ frontend https-in
 mode http
   bind *:443 ssl crt /etc/haproxy/certs alpn h2,http/1.1
   reqadd X-Forwarded-Proto:\ https
+  rspidel Server
+  rspidel X-Powered-By
+  rspidel X-Frame-Options
+  rspidel X-XSS-Protection
+  rspidel X-Frame-Options
+  rspidel X-Content-Type-Options
   rspadd X-Frame-Options:\ SAMEORIGIN # OR DENY
   rspadd X-XSS-Protection:\ 1;\ mode=block
   rspadd X-Content-Type-Options:\ nosniff

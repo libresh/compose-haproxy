@@ -1,6 +1,7 @@
 global
   log /dev/log local0 info
   log /dev/log local0 notice
+  ca-base /etc/ssl/certs
   maxconn 4096
   tune.ssl.default-dh-param 2048
   ssl-default-bind-ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA
@@ -36,6 +37,13 @@ mode http
   rspidel X-Powered-By
 
   acl acme path_beg /.well-known/acme
+
+{{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
+  {{ $reverseProxyFor := (first (groupByKeys $containers "Env.REVERSE_PROXY_FOR")) }}
+  {{ if $reverseProxyFor }}
+  use_backend {{ $host }}-acme if acme { hdr(host) -i {{ $host }} }
+  {{end}}
+{{end}}
   use_backend letsencrypt-web if acme
 {{ range $host, $containers := groupBy $ "Env.LIBRESH_WEBHOOK_HOST" }}
   use_backend webhook if { path_beg /XxosJDdRpo7Rww87VkJGzv1QLegnhh-uniq-libresh }
@@ -46,18 +54,28 @@ mode http
 {{end}}
 
 {{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
+  {{ $reverseProxyFor := (first (groupByKeys $containers "Env.REVERSE_PROXY_FOR")) }}
+  {{ if $reverseProxyFor }}
+backend {{ $host }}-acme
+  server Server {{ $reverseProxyFor }}:80
+  {{end}}
 backend {{ $host }}
   option http-server-close
   cookie SERVERID insert nocache indirect
   {{ range $container := $containers }}
     {{ $networkLen := len $container.Networks }}
-    {{ if eq $networkLen 1 }}
-      {{ $network := index $container.Networks 0 }}
-  server Server {{ $network.IP }}:80 cookie Server
+    {{ if $reverseProxyFor }}
+  http-request set-header Host {{ $host }}
+  server Server {{ $reverseProxyFor }}:443 ssl sni str({{ $host }}) ca-file ca-certificates.crt
     {{ else }}
-      {{ range $network := $container.Networks }}
-        {{ if eq $network.Name "lb_web" }}
+      {{ if eq $networkLen 1 }}
+        {{ $network := index $container.Networks 0 }}
   server Server {{ $network.IP }}:80 cookie Server
+      {{ else }}
+        {{ range $network := $container.Networks }}
+          {{ if eq $network.Name "lb_web" }}
+  server Server {{ $network.IP }}:80 cookie Server
+          {{end}}
         {{end}}
       {{end}}
     {{end}}

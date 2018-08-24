@@ -29,8 +29,8 @@ frontend http-in
 
 frontend https-in
 mode http
-  bind *:443 ssl no-sslv3 crt /etc/haproxy/certs
-  reqadd X-Forwarded-Proto:\ https
+  bind    *:443 ssl no-sslv3 crt /etc/haproxy/certs
+  reqadd  X-Forwarded-Proto:\ https
   rspadd  Strict-Transport-Security:\ max-age=15768000
   rspidel Server
   rspidel X-Powered-By

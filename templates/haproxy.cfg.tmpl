@@ -35,7 +35,8 @@ mode http
   rspidel Server
   rspidel X-Powered-By
 
-  use_backend letsencrypt-web if { path_beg /.well-known/acme }
+  acl acme path_beg /.well-known/acme
+  use_backend letsencrypt-web if acme
 {{ range $host, $containers := groupBy $ "Env.LIBRESH_WEBHOOK_HOST" }}
   use_backend webhook if { path_beg /XxosJDdRpo7Rww87VkJGzv1QLegnhh-uniq-libresh }
 {{end}}
